@@ -143,6 +143,9 @@ console_process_rx(struct serial_data *sd)
     if (ret > 0)
         command_dispatch(sd->buf, pop_count);
     if (ret) {
+        if (CONFIG_HAVE_BOOTLOADER_REQUEST && ret < 0 && pop_count == 32
+            && !memcmp(receive_buf, " \x1c Request Serial Bootloader!! ~", 32))
+            bootloader_request();
         serial_pop_input(sd, pop_count);
         if (ret > 0)
             command_send_ack();
